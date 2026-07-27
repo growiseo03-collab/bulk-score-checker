@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Full Site SEO Audit</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">◆</span>
+    <span class="brand-name">Full Site SEO Audit</span>
+  </div>
+  <div class="brand-sub">Technical SEO · Indexability · On-Page SEO — crawled live from your site</div>
+  <nav class="tool-nav">
+    <a href="/">Bulk Score Checker</a>
+    <a href="/audit" class="active">Full Site Audit</a>
+  </nav>
+</header>
+
+<main class="layout">
+
+  <section class="panel input-panel">
+    <h2>1. Enter a site to audit</h2>
+    <p class="hint">Crawls same-domain pages automatically (BFS), following internal links. Broken-link
+    verification isn't included here (kept out to stay within free hosting limits) — use the offline
+    Python tool for that. This checks Technical SEO, Indexability, and On-Page SEO.</p>
+    <input type="text" id="siteUrl" class="site-input" placeholder="example.com">
+    <div class="input-row">
+      <label class="mono-label">Max pages:
+        <select id="maxPages">
+          <option value="20">20</option>
+          <option value="50" selected>50</option>
+          <option value="100">100</option>
+          <option value="200">200</option>
+        </select>
+      </label>
+    </div>
+    <button id="runBtn" class="run-btn">Start Full Audit</button>
+  </section>
+
+  <section class="panel progress-panel" id="progressPanel" hidden>
+    <div class="progress-head">
+      <span id="progressLabel">Crawling...</span>
+      <span id="progressPct"></span>
+    </div>
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-current" id="progressCurrent"></div>
+  </section>
+
+  <section class="panel results-panel" id="resultsPanel" hidden>
+    <div class="results-head">
+      <h2>2. Results</h2>
+      <div class="results-actions">
+        <button id="exportPdf" class="secondary-btn">Export Full PDF Report</button>
+      </div>
+    </div>
+
+    <div class="summary-cards" id="summaryCards"></div>
+
+    <h3 class="section-title">Technical SEO</h3>
+    <div id="technicalTable"></div>
+
+    <h3 class="section-title">Indexability</h3>
+    <p class="hint">Whether a page is <em>allowed</em> to be indexed (noindex tags / robots.txt) — not a
+    live check of whether Google has actually indexed it (that needs Search Console access).</p>
+    <div id="indexabilityTable"></div>
+
+    <h3 class="section-title">On-Page SEO — Meta Title &amp; Description Scores</h3>
+    <div class="table-wrap">
+      <table id="onpageTable">
+        <thead><tr><th>URL</th><th>Status</th><th>Indexable</th><th>Title Score</th><th>Meta Score</th><th>Issues</th></tr></thead>
+        <tbody id="onpageBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<footer class="disclaimer">
+  On-page scores are calculated from the page's own HTML (length, presence, duplication). Off-page /
+  backlink-based Authority and Trust scores aren't shown here — use the Bulk Score Checker tool for those
+  estimates, or the offline Python tool for a combined report.
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="/audit.js"></script>
+</body>
+</html>

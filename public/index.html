@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bulk Site Score Checker</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">◆</span>
+    <span class="brand-name">Bulk Site Score Checker</span>
+  </div>
+  <div class="brand-sub">Authority · Trust · Spam Score — estimated from free public signals</div>
+  <nav class="tool-nav">
+    <a href="/" class="active">Bulk Score Checker</a>
+    <a href="/audit">Full Site Audit</a>
+  </nav>
+</header>
+
+<main class="layout">
+
+  <section class="panel input-panel">
+    <h2>1. Paste your URLs</h2>
+    <p class="hint">One per line. Handles 1000+ at a time — they're processed in background batches automatically.</p>
+    <textarea id="urlInput" placeholder="example.com&#10;https://another-site.com&#10;yet-another.org"></textarea>
+    <div class="input-row">
+      <label class="file-btn">
+        Upload .txt / .csv
+        <input type="file" id="fileInput" accept=".txt,.csv" hidden>
+      </label>
+      <span id="urlCount" class="url-count">0 URLs</span>
+    </div>
+    <button id="runBtn" class="run-btn">Run Check</button>
+  </section>
+
+  <section class="panel progress-panel" id="progressPanel" hidden>
+    <div class="progress-head">
+      <span id="progressLabel">Checking 0 / 0</span>
+      <span id="progressPct">0%</span>
+    </div>
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-current" id="progressCurrent"></div>
+  </section>
+
+  <section class="panel results-panel" id="resultsPanel" hidden>
+    <div class="results-head">
+      <h2>2. Results</h2>
+      <div class="results-actions">
+        <button id="exportCsv" class="secondary-btn">Export CSV</button>
+        <button id="exportPdf" class="secondary-btn">Export PDF</button>
+      </div>
+    </div>
+
+    <div class="summary-cards" id="summaryCards"></div>
+
+    <div class="table-wrap">
+      <table id="resultsTable">
+        <thead>
+          <tr>
+            <th data-sort="hostname">URL</th>
+            <th data-sort="statusCode">Status</th>
+            <th data-sort="authorityScore">Authority</th>
+            <th data-sort="trustScore">Trust</th>
+            <th data-sort="spamScore">Spam</th>
+            <th data-sort="domainAgeDays">Domain Age</th>
+            <th data-sort="sslValid">SSL</th>
+            <th data-sort="loadTimeMs">Load(ms)</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<footer class="disclaimer">
+  Scores are estimates from free public signals (SSL, domain age via RDAP, robots.txt/sitemap, on-page basics, TLD reputation).
+  They are not Moz Domain Authority, Ahrefs Domain Rating, or Moz Spam Score — those require paid proprietary backlink data.
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>
