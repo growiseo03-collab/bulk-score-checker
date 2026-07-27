@@ -22,6 +22,32 @@ function json(data, status = 200) {
   });
 }
 
+// Simple site-wide password lock using HTTP Basic Auth (browser shows a
+// native login popup). Username/password are set as Cloudflare secrets
+// (SITE_USERNAME / SITE_PASSWORD) - see README for where to set them in the
+// dashboard. If those secrets aren't set at all, the site stays open
+// (no lock) so local dev without secrets still works.
+function checkAuth(request, env) {
+  if (!env.SITE_USERNAME || !env.SITE_PASSWORD) return true; // no password configured, allow through
+
+  const authHeader = request.headers.get("Authorization") || "";
+  if (!authHeader.startsWith("Basic ")) return false;
+
+  const decoded = atob(authHeader.slice(6));
+  const separatorIndex = decoded.indexOf(":");
+  const user = decoded.slice(0, separatorIndex);
+  const pass = decoded.slice(separatorIndex + 1);
+
+  return user === env.SITE_USERNAME && pass === env.SITE_PASSWORD;
+}
+
+function unauthorizedResponse() {
+  return new Response("Password required.", {
+    status: 401,
+    headers: { "WWW-Authenticate": 'Basic realm="SEO Toolkit", charset="UTF-8"' },
+  });
+}
+
 async function handleCheck(request) {
   if (request.method === "GET") {
     return json({ status: "ok", info: "POST { urls: [...] } to this endpoint, max 25 URLs per call." });
@@ -92,6 +118,8 @@ async function handleCrawlBatch(request) {
 
 export default {
   async fetch(request, env) {
+    if (!checkAuth(request, env)) return unauthorizedResponse();
+
     const url = new URL(request.url);
 
     if (url.pathname === "/api/check") return handleCheck(request);
