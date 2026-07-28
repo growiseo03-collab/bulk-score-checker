@@ -97,7 +97,7 @@ async function getSiteMeta(origin, hostname) {
   return { robotsFound, sitemapFound, disallowRules, domainAgeDays };
 }
 
-function extractPageData(html, headers, disallowRules, pathname) {
+function extractPageData(html, headers, disallowRules, pathname, baseHostname, pageUrl) {
   const titleMatch = html.match(/<title[^>]*>([^<]*)<\/title>/i);
   const title = titleMatch ? titleMatch[1].trim() : "";
 
@@ -122,6 +122,30 @@ function extractPageData(html, headers, disallowRules, pathname) {
                         .replace(/<[^>]+>/g, " ");
   const wordCount = textOnly.trim().split(/\s+/).filter(Boolean).length;
 
+  // Open Graph tags (used by Facebook/social previews)
+  const ogTags = ["og:title", "og:description", "og:image", "og:url"];
+  const missingOgTags = ogTags.filter(tag => {
+    const re = new RegExp(`<meta[^>]+property=["']${tag}["']`, "i");
+    return !re.test(html);
+  });
+
+  // Rough resource-count estimate (scripts + stylesheets + images) - this is
+  // a heuristic based on tags present in the initial HTML only, not a real
+  // browser network trace.
+  const scriptTags = html.match(/<script[^>]+src=["'][^"']+["']/gi) || [];
+  const stylesheetTags = html.match(/<link[^>]+rel=["']stylesheet["']/gi) || [];
+  const estimatedRequestCount = scriptTags.length + stylesheetTags.length + imgTags.length;
+
+  // Crude minification heuristic: external .js files whose filename doesn't
+  // contain "min" - not a real minification check (would require fetching
+  // every JS file, multiplying subrequests), just a naming-convention signal.
+  const unminifiedJsGuess = scriptTags.filter(tag => {
+    const srcMatch = tag.match(/src=["']([^"']+)["']/i);
+    return srcMatch && !/\.min\.js/i.test(srcMatch[1]);
+  }).length;
+
+  const htmlSizeBytes = new TextEncoder().encode(html).length;
+
   // indexability
   const blockReasons = [];
   let indexable = true;
@@ -135,8 +159,16 @@ function extractPageData(html, headers, disallowRules, pathname) {
     indexable = false; blockReasons.push("blocked by robots.txt");
   }
 
-  // link discovery
+  // link discovery + internal/external counts
   const hrefMatches = [...html.matchAll(/<a\s[^>]*href=["']([^"'#]+)["'][^>]*>/gi)].map(m => m[1]);
+  let internalLinks = 0, externalLinks = 0;
+  for (const href of hrefMatches) {
+    if (/^(mailto:|tel:|javascript:)/i.test(href)) continue;
+    try {
+      const abs = new URL(href, pageUrl);
+      if (abs.hostname === baseHostname) internalLinks++; else externalLinks++;
+    } catch (e) { /* skip malformed */ }
+  }
 
   return {
     title, titleLength: title.length,
@@ -146,6 +178,12 @@ function extractPageData(html, headers, disallowRules, pathname) {
     imageCount: imgTags.length, imagesMissingAlt,
     wordCount,
     indexable, blockReasons,
+    missingOgTags,
+    estimatedRequestCount,
+    unminifiedJsGuess,
+    scriptCount: scriptTags.length,
+    htmlSizeKb: Math.round((htmlSizeBytes / 1024) * 10) / 10,
+    internalLinks, externalLinks,
     rawHrefs: hrefMatches,
   };
 }
@@ -188,7 +226,7 @@ async function crawlBatch({ startUrl, frontier, visited, batchSize, disallowRule
     }
 
     const pathname = new URL(current).pathname;
-    const data = extractPageData(html, resp.headers, disallowRules, pathname);
+    const data = extractPageData(html, resp.headers, disallowRules, pathname, baseHostname, current);
     const rawHrefs = data.rawHrefs;
     delete data.rawHrefs;
 
