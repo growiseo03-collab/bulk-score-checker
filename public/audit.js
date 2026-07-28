@@ -217,66 +217,9 @@ function renderResults() {
 
 // ---------- PDF export ----------
 document.getElementById('exportPdf').addEventListener('click', () => {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  const validPages = allPages.filter(p => p.statusCode && p.statusCode < 400);
-  const errorPages = allPages.filter(p => !p.statusCode || p.statusCode >= 400);
-  const indexableCount = validPages.filter(p => p.indexable).length;
-  const blockedCount = validPages.length - indexableCount;
-
-  doc.setFontSize(16);
-  doc.text('Full Website SEO Audit Report', 14, 16);
-  doc.setFontSize(9);
-  doc.setTextColor(120);
-  doc.text(`${siteMeta.startUrl || siteUrlInput.value} — Generated ${new Date().toLocaleString()}`, 14, 22);
-
-  doc.setFontSize(11);
-  doc.setTextColor(20);
-  doc.text('1. Technical SEO', 14, 32);
-  doc.autoTable({
-    startY: 36,
-    body: [
-      ['Pages crawled', String(allPages.length)],
-      ['Pages with errors', String(errorPages.length)],
-      ['SSL valid', siteMeta.sslValid ? 'Yes' : 'No'],
-      ['robots.txt found', siteMeta.robotsFound ? 'Yes' : 'No'],
-      ['sitemap.xml found', siteMeta.sitemapFound ? 'Yes' : 'No'],
-      ['Domain age', siteMeta.domainAgeDays ? (Math.round(siteMeta.domainAgeDays / 365 * 10) / 10) + ' years' : 'Unknown'],
-    ],
-    styles: { fontSize: 8 }, theme: 'plain',
+  generateFullSeoPdf({
+    startUrl: siteMeta.startUrl || siteUrlInput.value,
+    siteMeta,
+    allPages,
   });
-
-  let y = doc.lastAutoTable.finalY + 10;
-  doc.text('2. Indexability', 14, y);
-  doc.setFontSize(8);
-  doc.setTextColor(130);
-  doc.text('Whether pages are allowed to be indexed (not a live Google index check).', 14, y + 5);
-  doc.autoTable({
-    startY: y + 9,
-    body: [['Indexable pages', String(indexableCount)], ['Blocked from indexing', String(blockedCount)]],
-    styles: { fontSize: 8 }, theme: 'plain',
-  });
-
-  y = doc.lastAutoTable.finalY + 10;
-  doc.setFontSize(11);
-  doc.setTextColor(20);
-  doc.text('3. On-Page SEO — Meta Title & Description Scores', 14, y);
-  doc.autoTable({
-    startY: y + 4,
-    head: [['URL', 'Status', 'Indexable', 'Title', 'Meta', 'Issues']],
-    body: allPages.map(p => {
-      const issues = [...(p.titleIssues || []), ...(p.metaIssues || [])];
-      if (p.isDupTitle) issues.push('Dup. title');
-      if (p.isDupMeta) issues.push('Dup. meta');
-      return [
-        p.url, p.statusCode ?? 'ERR', p.indexable === undefined ? '—' : (p.indexable ? 'Yes' : 'No'),
-        p.titleScore ?? '—', p.metaScore ?? '—', issues.join('; ') || 'None',
-      ];
-    }),
-    styles: { fontSize: 6.5, cellPadding: 1.5 },
-    headStyles: { fillColor: [20, 22, 28] },
-    columnStyles: { 0: { cellWidth: 55 }, 5: { cellWidth: 55 } },
-  });
-
-  doc.save(`site-audit-${Date.now()}.pdf`);
 });
