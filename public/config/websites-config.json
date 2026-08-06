@@ -1,0 +1,60 @@
+{
+  "websites": [
+    {
+      "id": "auracoredigital",
+      "name": "Aura Core Digital",
+      "niche": "Digital Marketing Agency (SEO, web design, branding)",
+      "targetKeywords": ["seo services", "digital marketing agency", "website design company"],
+      "brandVoice": "professional, confident, friendly, no fluff or filler sentences",
+      "backlink": {
+        "url": "https://auracoredigital.com",
+        "anchorText": "digital marketing agency",
+        "placementRule": "Insert the link naturally ONE time, inside the body (not the intro sentence, not the heading, not the last sentence). It must read as a genuine reference, never forced or salesy."
+      },
+      "contentTypes": {
+        "article": {
+          "wordCount": 1200,
+          "tone": "informative, SEO-optimized, written for a blog reader",
+          "structure": "Catchy title, short intro (2-3 sentences), 3-5 H2 sections, short conclusion with a soft CTA",
+          "extraRules": "Include one H2 with a numbered or bulleted list. Use the target keywords naturally, do not stuff them."
+        },
+        "guestPost": {
+          "wordCount": 1000,
+          "tone": "authoritative, written as an outside industry expert, not promotional",
+          "structure": "Title, intro, 3 H2 sections, then a 2-sentence author bio paragraph at the very end",
+          "extraRules": "Must NOT sound like the agency talking about itself — write as a neutral expert contributing value to the host site's audience."
+        },
+        "web2": {
+          "wordCount": 500,
+          "tone": "casual, easy-to-read blog style",
+          "structure": "Short catchy title, 2-3 short paragraphs, no headings needed",
+          "extraRules": "Place the backlink within the first paragraph. Keep sentences short and skimmable — this is for Blogger/WordPress.com/Medium style posts."
+        },
+        "profileBacklink": {
+          "wordCount": 150,
+          "tone": "bio-style, third person",
+          "structure": "One short paragraph — like a forum, directory, or community 'About Me' bio",
+          "extraRules": "Mention the niche naturally, work in the backlink once. Should read like a genuine profile bio, never like an ad."
+        },
+        "pdfSubmission": {
+          "wordCount": 800,
+          "tone": "informative, structured like a downloadable guide/resource",
+          "structure": "Title, short intro, 3-4 sections with subheadings, closing 'Resources' section",
+          "extraRules": "End with a short 'Resources' or 'About the Author' section that naturally includes the backlink — this text will be turned into a PDF."
+        },
+        "imageSubmission": {
+          "wordCount": 100,
+          "tone": "descriptive, concise",
+          "structure": "Image title, ALT text suggestion, 2-3 sentence caption/description",
+          "extraRules": "Provide the ALT text separately, then a short caption that naturally mentions the brand/backlink context (not the raw URL)."
+        },
+        "articleSubmission": {
+          "wordCount": 900,
+          "tone": "neutral, informative, written for article-directory audiences",
+          "structure": "Title, intro, 3 H2 sections, closing 'Author Resource Box' paragraph",
+          "extraRules": "The Resource Box paragraph at the end must contain the backlink — this is standard for article directory submissions."
+        }
+      }
+    }
+  ]
+}
